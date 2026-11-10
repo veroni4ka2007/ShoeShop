@@ -1,6 +1,7 @@
 import sys
 import os
 import shutil
+import configparser
 from datetime import datetime
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QDialog, QMessageBox, QFileDialog, QLabel,
@@ -28,12 +29,16 @@ COLOR_OUT_OF_STOCK = "#ADD8E6"
 current_user = {"fio": "Гость", "role": "guest"}
 
 # --- Настройки подключения к БД ---
+config = configparser.ConfigParser()
+config.read("config.ini", encoding="utf-8")
+
+_db = config["database"] if config.has_section("database") else {}
 DB_CONFIG = {
-    'host': 'localhost',
-    'database': 'magazin_obuv',
-    'user': 'postgres',
-    'password': 'change_me',
-    'port': 5432
+    "host": _db.get("host", "localhost"),
+    "database": _db.get("name", "magazin_obuv"),
+    "user": _db.get("user", "postgres"),
+    "password": _db.get("password", ""),
+    "port": int(_db.get("port", "5432")),
 }
 # --- Функции для работы с БД ---
 def get_db_connection():
