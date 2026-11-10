@@ -47,7 +47,7 @@ def get_db_connection():
         conn = psycopg2.connect(**DB_CONFIG)
         return conn
     except Exception as e:
-        QMessageBox.critical(None, "Ошибка БД", f"Не удалось подключиться к базе данных:\n{e}")
+        QMessageBox.critical(None, "Ошибка БД", f"Не удалось подключиться к базе данных:\n{e}\n\nПроверьте параметры подключения в файле config.ini.")
         return None
 
 def fetch_all_products():
