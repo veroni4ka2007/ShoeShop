@@ -645,7 +645,7 @@ class LoginWindow(QMainWindow):
         super().__init__()
         self.app = app
         uic.loadUi("ui/login_form.ui", self)
-        self.setWindowTitle("Вход в систему GIT GIT GIT")
+        self.setWindowTitle("Вход в систему — Магазин обуви")
         if os.path.exists(ICON_PATH):
             self.setWindowIcon(QIcon(ICON_PATH))
         try:
