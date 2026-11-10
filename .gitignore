@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Виртуальные окружения
+venv/
+.venv/
+env/
+
+# Среды разработки
+.idea/
+.vscode/
+
+# Результаты сборки
+build/
+dist/
+
+# Локальные настройки и секреты
+config.ini
+.env
+*.log
+
+# Служебные файлы ОС
+Thumbs.db
+.DS_Store
