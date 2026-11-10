@@ -198,7 +198,7 @@ def delete_product(product_id):
             cur.execute("SELECT COUNT(*) FROM order_tovar WHERE tovar_id = %s;", (product_id,))
             count = cur.fetchone()[0]
             if count > 0:
-                QMessageBox.warning(None, "Предупреждение", "Нельзя удалить товар, присутствующий в заказах.")
+                QMessageBox.warning(None, "Предупреждение", "Нельзя удалить товар: он уже включён в заказы. Сначала удалите его из заказов.")
                 return False
             cur.execute("DELETE FROM tovar WHERE tovar_id = %s;", (product_id,))
         conn.commit()
