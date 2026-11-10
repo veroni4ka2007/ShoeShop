@@ -24,6 +24,7 @@ COLOR_ADD_BG = "#7FFF00"
 COLOR_ACCENT = "#00FA9A"
 COLOR_HIGH_DISCOUNT = "#2E8B57"
 COLOR_OUT_OF_STOCK = "#ADD8E6"
+OUT_OF_STOCK_THRESHOLD = 0
 
 # Глобальные переменные
 current_user = {"fio": "Гость", "role": "guest"}
@@ -758,7 +759,7 @@ class MainWindow(QMainWindow):
         if prod.get("discount", 0) > 0:
             discounted = prod["price"] * (1 - prod["discount"] / 100.0)
             price_text = f"<s><span style='color:red'>{prod['price']:.2f}</span></s>  <span style='color:black'>{discounted:.2f}</span>"
-        quantity_color = COLOR_OUT_OF_STOCK if prod['quantity'] <= 0 else "transparent"
+        quantity_color = COLOR_OUT_OF_STOCK if prod['quantity'] <= OUT_OF_STOCK_THRESHOLD else "transparent"
         info = (
             f"<b>Артикул:</b> {prod['artikul']}<br>"
             f"<b>Категория товара:</b> {prod['category']}<br>"
