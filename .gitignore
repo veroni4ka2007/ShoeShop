@@ -20,6 +20,9 @@ config.ini
 .env
 *.log
 
+# Резервные копии базы данных
+backups/
+
 # Служебные файлы ОС
 Thumbs.db
 .DS_Store

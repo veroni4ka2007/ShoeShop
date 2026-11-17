@@ -101,5 +101,49 @@ docker compose start
 
 Не используйте `docker compose down -v` в рамках практики №12: постоянные тома настраиваются в практике №13.
 
+## Постоянное хранение и сети
+
+### Именованный том
+Для PostgreSQL подключён именованный том `db_data` к каталогу
+`/var/lib/postgresql/data`. Файлы базы хранятся вне изменяемого слоя
+контейнера и сохраняются при `docker compose down` / `up` и при
+`docker compose up -d --force-recreate db`.
+
+### Резервная копия и восстановление
+Перед подключением нового тома обязательно создайте резервную копию —
+новый том содержит новую пустую базу, прежние таблицы в него не попадут.
+Каталог `backups/` исключён через `.gitignore`, дамп не публикуется.
+
+```bash
+docker compose exec db pg_dump -U shoe_user -d shoe_store -f /tmp/shoe_store_before_volume.sql
+docker compose cp db:/tmp/shoe_store_before_volume.sql ./backups/shoe_store_before_volume.sql
+docker compose down
+docker compose up --build -d
+docker compose cp ./backups/shoe_store_before_volume.sql db:/tmp/restore.sql
+docker compose exec db psql -v ON_ERROR_STOP=1 -U shoe_user -d shoe_store -f /tmp/restore.sql
+docker compose run --rm db-check
+```
+
+### Сеть
+Оба сервиса подключены к пользовательской сети `shoe-backend`
+(драйвер `bridge`). Благодаря ей `db-check` обращается к PostgreSQL
+по имени сервиса `db:5432`. Порт опубликован только на локальном
+интерфейсе хоста: `127.0.0.1:5433:5432`. PyQt5-приложение в Windows
+подключается к `localhost:5433`.
+
+```bash
+docker compose config --quiet
+docker compose up -d
+docker compose run --rm db-check
+docker compose port db 5432
+docker network ls
+docker network inspect shoeshop_shoe-backend
+```
+
+### Внимание
+`docker compose down -v` удаляет именованные тома и приведёт к потере
+учебной базы — **не выполняйте эту команду**. Для проверки сохранности
+достаточно `docker compose up -d --force-recreate db`.
+
 ## Автор
 Кононова Вероника, группа ЩПКО-02-23
