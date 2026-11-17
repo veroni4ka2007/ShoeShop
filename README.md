@@ -48,5 +48,58 @@
 - `config.ini.example` — образец настроек подключения;
 - `requirements.txt` — зависимости проекта.
 
+## Запуск PostgreSQL через Docker Compose
+
+### Предварительные требования
+- Docker Desktop с Linux containers
+- Docker Compose v2
+- файлы `compose.yaml`, `.env.example`, `docker/db-check/`
+
+### Создание `.env`
+1. Скопируйте `.env.example` в `.env`.
+2. Задайте свой локальный пароль в `POSTGRES_PASSWORD`.
+3. При необходимости измените `POSTGRES_HOST_PORT` (по умолчанию `5433`).
+4. Файл `.env` не коммитится (указан в `.gitignore`).
+
+### Запуск сервисов
+```bash
+docker compose config --quiet
+docker compose up --build -d
+docker compose ps
+docker compose logs --tail=40 db
+docker compose logs --tail=40 db-check
+```
+
+Сервис `db` (PostgreSQL 14) работает постоянно. Сервис `db-check` — одноразовая проверка подключения; статус `Exited (0)` после успешной проверки является нормальным.
+
+### Импорт базы данных
+```bash
+docker compose cp database/shoe_store.sql db:/tmp/shoe_store.sql
+docker compose exec db psql -v ON_ERROR_STOP=1 -U shoe_user -d shoe_store -f /tmp/shoe_store.sql
+docker compose run --rm db-check
+```
+
+После импорта `db-check` должен показать положительное число таблиц (в учебной схеме — 5).
+
+### Адрес подключения приложения
+В локальном `config.ini` для PyQt5-приложения укажите:
+- `host = localhost`
+- `port = 5433` (или значение `POSTGRES_HOST_PORT`)
+- `name = shoe_store`
+- `user = shoe_user`
+- `password` — тот же, что в `.env`
+
+Сервис `db-check` внутри Compose подключается к `db:5432` по имени сервиса.
+
+### Проверка и остановка
+```bash
+docker compose exec db pg_isready -U shoe_user -d shoe_store
+docker compose run --rm db-check
+docker compose stop
+docker compose start
+```
+
+Не используйте `docker compose down -v` в рамках практики №12: постоянные тома настраиваются в практике №13.
+
 ## Автор
 Кононова Вероника, группа ЩПКО-02-23
